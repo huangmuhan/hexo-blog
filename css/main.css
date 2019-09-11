@@ -630,7 +630,7 @@ pre .javascript .function {
   background-color: #e7f4e9;
 }
 .post-body .label.warning {
-  background-color: #fcf6e1;
+  background-color: #fbf1d2;
 }
 .post-body .label.danger {
   background-color: #fae8eb;
@@ -746,6 +746,16 @@ pre .javascript .function {
   margin-bottom: 0;
   padding-top: 0;
 }
+.post-body .note p,
+.post-body .note ul,
+.post-body .note ol,
+.post-body .note table,
+.post-body .note pre,
+.post-body .note blockquote,
+.post-body .note img {
+  line-height: 20px;
+  font-size: 14px;
+}
 .post-body .note p:first-child,
 .post-body .note ul:first-child,
 .post-body .note ol:first-child,
@@ -805,14 +815,15 @@ pre .javascript .function {
   color: #5cb85c;
 }
 .post-body .note.warning {
-  border-left-color: #f0ad4e;
+  border-left-color: #d28011;
 }
 .post-body .note.warning h2,
 .post-body .note.warning h3,
 .post-body .note.warning h4,
 .post-body .note.warning h5,
 .post-body .note.warning h6 {
-  color: #f0ad4e;
+  color: #d28011;
+  margin-bottom: 5px;
 }
 .post-body .note.danger {
   border-left-color: #d9534f;
@@ -1674,7 +1685,7 @@ article:last-child .post-eof {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #e3006b;
+  background: #ffe2ff;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
