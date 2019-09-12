@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/hexo-blog/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/hexo-blog/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/hexo-blog/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/hexo-blog/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/hexo-blog/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/hexo-blog/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/hexo-blog/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+  <script src="/hexo-blog/lib/pace/pace.min.js?v=1.0.2"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/hexo-blog/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Environment Details Host OS: Red Hat Enterprise Linux Server release 7.6">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Build a PXE Kickstart Server">
+<meta property="og:url" content="https://huangmuhan.github.io/hexo-blog/2019/09/12/Build-a-PXE-Kickstart-Server/index.html">
+<meta property="og:site_name" content="工程師筆記">
+<meta property="og:description" content="Environment Details Host OS: Red Hat Enterprise Linux Server release 7.6">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-09-12T08:17:12.041Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Build a PXE Kickstart Server">
+<meta name="twitter:description" content="Environment Details Host OS: Red Hat Enterprise Linux Server release 7.6">
+  <link rel="canonical" href="https://huangmuhan.github.io/hexo-blog/2019/09/12/Build-a-PXE-Kickstart-Server/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Build a PXE Kickstart Server | 工程師筆記</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/hexo-blog/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">工程師筆記</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">My Engineering Notes</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/hexo-blog/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/hexo-blog/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-blog-with-hexo">
+      
+    
+
+    <a href="/hexo-blog/site-blog" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Blog with Hexo</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-linux-basics">
+      
+    
+
+    <a href="/hexo-blog/site-linux" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Linux Basics</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="https://huangmuhan.github.io/hexo-blog/hexo-blog/2019/09/12/Build-a-PXE-Kickstart-Server/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mu-Han Huang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/hexo-blog/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="工程師筆記">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Build a PXE Kickstart Server
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              
+                
+              
+
+              <time title="Created: 2019-09-12 16:35:45 / Modified: 16:17:12" itemprop="dateCreated datePublished" datetime="2019-09-12T16:35:45+08:00">2019-09-12</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Environment-Details"><a href="#Environment-Details" class="headerlink" title="Environment Details"></a>Environment Details</h2><ul>
+<li><strong>Host OS</strong>: Red Hat Enterprise Linux Server release 7.6</li>
+</ul>
+<a id="more"></a>
+
+<h2 id="Setup-DHCP-Service"><a href="#Setup-DHCP-Service" class="headerlink" title="Setup DHCP Service"></a>Setup DHCP Service</h2><p><a href="https://en.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol" target="_blank" rel="noopener">Dynamic Host Configuration Protocol (DHCP)</a> is a network management protocal that enables a server to dynamically assign IP addresses and network configuration parameters to devices on the network. DHCP servers operate with client-server architecture. Any device (client) on the network can associate a DHCP broadcast request to the server, and the DHCP server may response with specific information for each client.</p>
+<ul>
+<li><p>Install DHCP package</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y dhcp</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Create <code>/etc/dhcp/dhcpd.conf</code> file</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Server domain name     : localhost</span></span><br><span class="line"><span class="comment"># Server External IP     : 10.102.30.20</span></span><br><span class="line"><span class="comment"># Server IP Subnet       : 10.102.30.0/24</span></span><br><span class="line"><span class="comment"># Server External Router : 10.102.30.1</span></span><br><span class="line"><span class="comment"># DHCP allocate IP start : 10.102.30.51</span></span><br><span class="line"><span class="comment"># DHCP allocate IP end   : 10.102.30.70</span></span><br><span class="line"></span><br><span class="line">option domain-name <span class="string">"localhost.localdomain"</span>;</span><br><span class="line">option domain-name-servers 10.102.30.20;</span><br><span class="line">default-lease-time 600;</span><br><span class="line">max-lease-time 7200;</span><br><span class="line"><span class="built_in">log</span>-facility local7;</span><br><span class="line">allow booting;</span><br><span class="line">allow bootp;</span><br><span class="line"></span><br><span class="line">subnet 10.102.30.0 netmask 255.255.255.0&#123;</span><br><span class="line">    range 10.102.30.51 10.102.30.70;</span><br><span class="line">    option routers 10.102.30.1;</span><br><span class="line">    next-server 10.102.30.20;</span><br><span class="line">    filename <span class="string">"pxelinux.0"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Restart and enable DHCP service</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart dhcpd</span><br><span class="line">systemctl <span class="built_in">enable</span> dhcpd</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Stop and disable firewalld service</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl stop firewalld</span><br><span class="line">systemctl <span class="built_in">disable</span> firewalld</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="Setup-TFTP-Service"><a href="#Setup-TFTP-Service" class="headerlink" title="Setup TFTP Service"></a>Setup TFTP Service</h2><p><a href="https://en.wikipedia.org/wiki/Trivial_File_Transfer_Protocol" target="_blank" rel="noopener">Trivial File Transfer Protocol (TFTP)</a> is a file transfer protocal that enables a client to either get file from or put file to a remote TFTP server. It is commonly used in the bootstrap loading stage of network boot process. Clients on a local network can issue read or write requests to a designated file on the remote server, and the TFTP server may send the file in fixed length blocks for each client.</p>
+<ul>
+<li><p>Install TFTP packages</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum install -y tftp</span><br><span class="line">yum install -y tftp-server</span><br><span class="line">yum install -y xinetd</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Create <code>/etc/xinetd.d/tftp</code> file</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">service tftp</span><br><span class="line">&#123;</span><br><span class="line">        port            = 69</span><br><span class="line">        <span class="built_in">disable</span>         = yes</span><br><span class="line">        socket_type     = dgram</span><br><span class="line">        protocol        = udp</span><br><span class="line">        <span class="built_in">wait</span>            = yes</span><br><span class="line">        user            = root</span><br><span class="line">        group           = root</span><br><span class="line">        groups          = yes</span><br><span class="line">        server          = /usr/sbin/in.tftpd</span><br><span class="line">        server_args     = -s /var/lib/tftpboot</span><br><span class="line">        per_source      = 11</span><br><span class="line">        cps             = 100 2</span><br><span class="line">        flags           = IPv4</span><br><span class="line">        instances       = UNLIMITED</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Restart and enable TFTP services</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart xinetd</span><br><span class="line">systemctl <span class="built_in">enable</span> xinetd</span><br><span class="line"></span><br><span class="line">systemctl restart tftp</span><br><span class="line">systemctl <span class="built_in">enable</span> tftp</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="Setup-SYSLinux"><a href="#Setup-SYSLinux" class="headerlink" title="Setup SYSLinux"></a>Setup SYSLinux</h2><p><a href="https://en.wikipedia.org/wiki/SYSLINUX" target="_blank" rel="noopener">SYSLinux</a> is a set of lightweight Master Boot Record (MBR) boot loaders including ISOLinux, PXELinux, and EXTLinux. It is commonly used for boot or rescue floppy disks or other lightweight boot systems. In this tutorial, we target to use DHCP service to establish IP networking, download the bootstrap program using TFTP service, and use PXELinux to load and configurate operating system kernal on the remote host.</p>
+<ul>
+<li><p>Install SYSLinux package</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y syslinux</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Copy required files from boot ISO</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># download boot ISO from the official website and verify checksum</span></span><br><span class="line"><span class="comment"># mount ISO file to disk</span></span><br><span class="line">mount rhel-server-7.6-x86_64-dvd.iso /mnt</span><br><span class="line"></span><br><span class="line"><span class="comment"># copy required boot files</span></span><br><span class="line">cp /usr/share/syslinux/pxelinux.0 /var/lib/tftpboot/</span><br><span class="line">cp /mnt/images/pxeboot/initrd.img /var/lib/tftpboot/</span><br><span class="line">cp /mnt/images/pxeboot/vmlinuz /var/lib/tftpboot/</span><br><span class="line"></span><br><span class="line"><span class="comment"># copy required pxelinux config files</span></span><br><span class="line">mkdir -p /var/lib/tftpboot/pxelinux.cfg</span><br><span class="line">cp /mnt/isolinux/*.msg /var/lib/tftpboot/pxelinux.cfg</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Create <code>/var/lib/tftpboot/pxelinux.cfg/default</code> file</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">default linux</span><br><span class="line">prompt 0</span><br><span class="line">timeout 600 </span><br><span class="line"></span><br><span class="line">label linux</span><br><span class="line">  menu label ^Install or upgrade an existing system</span><br><span class="line">  menu default</span><br><span class="line">  kernel vmlinuz</span><br><span class="line">  <span class="comment"># specify the location of your tftp server</span></span><br><span class="line">  append ks=ftp://10.102.30.20/pub/ks.cfg initrd=initrd.img</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="Setup-vsFTPd-service"><a href="#Setup-vsFTPd-service" class="headerlink" title="Setup vsFTPd service"></a>Setup vsFTPd service</h2><p><a href="https://en.wikipedia.org/wiki/Vsftpd" target="_blank" rel="noopener">Very Secure FTP Daemon (vsFTPd)</a> is an secure, fast, and stable FTP server for Unix-like systems, licensed under the GNU General Public License.</p>
+<ul>
+<li><p>Install vsFTPd package</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y vsftpd</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Restart and enable vsFTPd service</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart vsftpd</span><br><span class="line">systemctl <span class="built_in">enable</span> vsftpd</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Copy required files from boot ISO</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># copy all files from the boot ISO to FTP server</span></span><br><span class="line">mkdir -p /var/ftp/rhel-7.6</span><br><span class="line">cp -r /mnt/* /var/ftp/rhel-7.6</span><br><span class="line"></span><br><span class="line"><span class="comment"># umount the boot ISO</span></span><br><span class="line">umount rhel-server-7.6-x86_64-dvd.iso</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="Setup-Kickstart-service"><a href="#Setup-Kickstart-service" class="headerlink" title="Setup Kickstart service"></a>Setup Kickstart service</h2><p>A Kickstart service automates the operating system installation through network boot PXE server. In this process, a kickstart file which contains basic settings of installation needs to be defined.</p>
+<ul>
+<li><p>Install kickstart package</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y system-config-kickstart</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Create <code>/var/ftp/pub/ks.cfg</code> file</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#############################</span></span><br><span class="line"><span class="comment"># configuration information #</span></span><br><span class="line"><span class="comment">#############################</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># set system authorization information</span></span><br><span class="line">auth --enableshadow --passalgo=sha512</span><br><span class="line"></span><br><span class="line"><span class="comment"># set network installation media location on your TFTP server</span></span><br><span class="line">url --url=<span class="string">"ftp://10.102.30.20/rhel-7.6"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># set target disk</span></span><br><span class="line">ignoredisk --only-use=sda</span><br><span class="line"></span><br><span class="line"><span class="comment"># set keyboard layouts</span></span><br><span class="line">keyboard --vckeymap=us --xlayouts=<span class="string">'us'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># system language</span></span><br><span class="line">lang en_US.UTF-8</span><br><span class="line"></span><br><span class="line"><span class="comment"># enable and disable services</span></span><br><span class="line">firstboot --<span class="built_in">enable</span></span><br><span class="line">firewall --disabled</span><br><span class="line">selinux --disabled</span><br><span class="line"></span><br><span class="line"><span class="comment"># execute kickstart installation in text mode</span></span><br><span class="line">text</span><br><span class="line"></span><br><span class="line"><span class="comment"># configure without X-Window system</span></span><br><span class="line">skipx</span><br><span class="line"></span><br><span class="line"><span class="comment"># set network information</span></span><br><span class="line">network --bootproto=dhcp --onboot=on</span><br><span class="line"></span><br><span class="line"><span class="comment"># set root password to "mypassword"</span></span><br><span class="line">rootpw <span class="string">"mypassword"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># set system timezone</span></span><br><span class="line">timezone Asia/Taipei --isUtc</span><br><span class="line"></span><br><span class="line"><span class="comment"># configure system bootloader</span></span><br><span class="line">bootloader --location=mbr --append=<span class="string">"rhgb quiet crashkernel=auto"</span></span><br><span class="line">zerombr</span><br><span class="line"></span><br><span class="line"><span class="comment"># set disk partition</span></span><br><span class="line">clearpart --all --initlabel</span><br><span class="line">part / --fstype=<span class="string">"xfs"</span> --ondisk=sda --size=20480 --grow</span><br><span class="line">part swap --fstype=<span class="string">"swap"</span> --ondisk=sda --size=20480</span><br><span class="line"></span><br><span class="line"><span class="comment"># shutdown after installation</span></span><br><span class="line">shutdown</span><br><span class="line"></span><br><span class="line"><span class="comment">########################</span></span><br><span class="line"><span class="comment"># package installation #</span></span><br><span class="line"><span class="comment">########################</span></span><br><span class="line"></span><br><span class="line">%packages</span><br><span class="line">@core</span><br><span class="line">@development</span><br><span class="line">net-tools</span><br><span class="line">screen</span><br><span class="line">ipmitool</span><br><span class="line">vim</span><br><span class="line">%end</span><br><span class="line"></span><br><span class="line"><span class="comment">##############</span></span><br><span class="line"><span class="comment"># post setup #</span></span><br><span class="line"><span class="comment">##############</span></span><br><span class="line"></span><br><span class="line">%post --interpreter=/bin/bash</span><br><span class="line"></span><br><span class="line"><span class="comment"># get host networking information</span></span><br><span class="line">nicname1=`ip addr show|egrep <span class="string">'brd'</span>|egrep <span class="string">'inet'</span>|awk <span class="string">'&#123;print $NF&#125;'</span>|awk <span class="string">'NR==1&#123;print&#125;'</span>`</span><br><span class="line">var=`ifconfig <span class="variable">$nicname1</span> |grep -i netmask |awk <span class="string">'&#123;print $2&#125;'</span>`</span><br><span class="line">NUM=`<span class="built_in">echo</span> <span class="variable">$&#123;var##*.&#125;</span>`</span><br><span class="line">STATICIP=`<span class="built_in">echo</span> <span class="variable">$var</span>`</span><br><span class="line"><span class="comment"># define your external gateway</span></span><br><span class="line">GATEWAY=<span class="string">"10.102.30.1"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># configurate the first network interface to static mode</span></span><br><span class="line">sed -i <span class="string">"s/BOOTPROTO.*$/BOOTPROTO=static/"</span> /etc/sysconfig/network-scripts/ifcfg-<span class="variable">$nicname1</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"IPADDR=<span class="variable">$STATICIP</span>"</span> &gt;&gt; /etc/sysconfig/network-scripts/ifcfg-<span class="variable">$nicname1</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"NETMASK=255.255.255.0"</span> &gt;&gt; /etc/sysconfig/network-scripts/ifcfg-<span class="variable">$nicname1</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"GATEWAY=<span class="variable">$GATEWAY</span>"</span> &gt;&gt; /etc/sysconfig/network-scripts/ifcfg-<span class="variable">$nicname1</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"DNS1=8.8.8.8"</span> &gt;&gt; /etc/sysconfig/network-scripts/ifcfg-<span class="variable">$nicname1</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"<span class="variable">$STATICIP</span> kickstart<span class="variable">$NUM</span>.com kickstart<span class="variable">$NUM</span>"</span> &gt;&gt; /etc/hosts</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"kickstart<span class="variable">$NUM</span>"</span> &gt;&gt; /proc/sys/kernel/hostname</span><br><span class="line"></span><br><span class="line"><span class="comment"># set system time to hardware clock</span></span><br><span class="line">hwclock -w</span><br><span class="line">%end</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Your PXE kickstart server is ready.</strong></p>
+</li>
+</ul>
+<br>
+<br>
+<br>
+<br>
+<br>
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/hexo-blog/2019/09/11/Change-Root-Password-for-RHEL-official-qcow2-images/" rel="next" title="Change Root Password for RHEL Official qcow2 Images">
+                  <i class="fa fa-chevron-left"></i> Change Root Password for RHEL Official qcow2 Images
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Environment-Details"><span class="nav-number">1.</span> <span class="nav-text">Environment Details</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Setup-DHCP-Service"><span class="nav-number">2.</span> <span class="nav-text">Setup DHCP Service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Setup-TFTP-Service"><span class="nav-number">3.</span> <span class="nav-text">Setup TFTP Service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Setup-SYSLinux"><span class="nav-number">4.</span> <span class="nav-text">Setup SYSLinux</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Setup-vsFTPd-service"><span class="nav-number">5.</span> <span class="nav-text">Setup vsFTPd service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Setup-Kickstart-service"><span class="nav-number">6.</span> <span class="nav-text">Setup Kickstart service</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/hexo-blog/images/avatar.jpg"
+      alt="Mu-Han Huang">
+  <p class="site-author-name" itemprop="name">Mu-Han Huang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/hexo-blog/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+      
+        
+      
+        <a href="https://huangmuhan.github.io" title="Website &rarr; https://huangmuhan.github.io"><i class="fa fa-fw fa-home"></i></a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+      
+        
+      
+        <a href="https://github.com/huangmuhan" title="GitHub &rarr; https://github.com/huangmuhan" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+      
+        
+      
+        <a href="mailto:kgbcathy@gmail.com" title="E-Mail &rarr; mailto:kgbcathy@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+      
+        
+      
+        <a href="https://www.linkedin.com/in/mu-han-huang-44a29395/" title="Linkedin &rarr; https://www.linkedin.com/in/mu-han-huang-44a29395/" rel="noopener" target="_blank"><i class="fa fa-fw fa-linkedin"></i></a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mu-Han Huang</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/hexo-blog/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/hexo-blog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/hexo-blog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/hexo-blog/js/utils.js?v=7.4.0"></script><script src="/hexo-blog/js/motion.js?v=7.4.0"></script>
+<script src="/hexo-blog/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/hexo-blog/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
